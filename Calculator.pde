@@ -128,6 +128,7 @@ private void setColorOfDot() {
 }
 
 private void setColorOfPlusMinus() {
+  if (clickTimeOnPlusMinus >= 0) {
     if (second() != endTimeForPlusMinus) {
       plusOrMinus = plusOrMinusRed;
     } else {
