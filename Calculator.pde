@@ -4,10 +4,15 @@ color lightGrey;
 color white;
 color red;
 color colorOfDot;
+color colorOfEqual;
+color colorOfMinus;
+color colorOfMultiplication;
+color colorOfPlus;
+color colorOfDivision;
 
 int DELAY_IN_SECONDS = 1;
 
-int clickTimeOnDot, endTimeForDot, clickTimeOnPlusMinus, endTimeForPlusMinus;
+int clickTimeOnDot, endTimeForDot, clickTimeOnPlusMinus, endTimeForPlusMinus, clickTimeOnEqual, endTimeForEqual;
 
 PImage plusOrMinusDarkestGrey;
 PImage plusOrMinusRed;
@@ -20,6 +25,9 @@ void setup() {
 
   clickTimeOnPlusMinus = Integer.MIN_VALUE;
   endTimeForPlusMinus = Integer.MIN_VALUE;
+
+  clickTimeOnEqual = Integer.MIN_VALUE;
+  endTimeForEqual = Integer.MIN_VALUE;
 
   // loading custom fonts
   fonts = new HashMap<String, PFont>();
@@ -66,9 +74,27 @@ void draw() {
   strokeWeight(39);
   drawCircle(138 + (39 / 2), 345 + (39 / 2), 151, 151, lightGrey);
 
-  if (isInsideCircle(33 + 35, 465 + 35, 35)) {
+  // operators
+  setColorOfEqual();
+  drawText("=", 210, 386, 80, fonts.get("openSansLight"), colorOfEqual);
+  drawText("−", 220, 330, 48, fonts.get("openSans"), colorOfMinus);
+  drawText("×", 295, 408, 48, fonts.get("openSans"), colorOfMultiplication);
+  drawText("+", 220, 482, 48, fonts.get("openSans"), colorOfPlus);
+  drawText("÷", 144, 408, 48, fonts.get("openSans"), colorOfDivision);
+
+  if (isMouseInsideCircle(33 + 35, 465 + 35, 35)) {
     cursor(HAND);
-  } else if (isInsideCircle(362 + 35, 465 + 35, 35)) {
+  } else if (isMouseInsideCircle(362 + 35, 465 + 35, 35)) {
+    cursor(HAND);
+  } else if (isMouseInsideRectangle(213, 431, 38, 23)) {
+    cursor(HAND);
+  } else if (isMouseInsideRectangle(220, 352, 26, 26)) {
+    cursor(HAND);
+  } else if (isMouseInsideRectangle(295, 430, 26, 26)) {
+    cursor(HAND);
+  } else if (isMouseInsideRectangle(220, 504, 26, 26)) {
+    cursor(HAND);
+  } else if (isMouseInsideRectangle(144, 430, 26, 26)) {
     cursor(HAND);
   }
   // in normal cases, cursor is always of type 'ARROW'
@@ -97,22 +123,36 @@ void drawCircle(float coordinateX, float coordinateY, float width, float height,
   ellipse(coordinateX, coordinateY, width, height);
 }
 
-private boolean isInsideCircle (float coordinateX, float coordinateY, int radius) {
+private boolean isMouseInsideCircle (float coordinateX, float coordinateY, int radius) {
   float distance = sqrt(pow((mouseX - coordinateX), 2) + pow((mouseY - coordinateY), 2));
   return distance <= radius ? true : false;
 }
 
+private boolean isMouseInsideRectangle (float coordinateX, float coordinateY, float width, float height) {
+  if (mouseX >= coordinateX && mouseX <= (coordinateX + width) && mouseY >= coordinateY && mouseY <= (coordinateY + height)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 void mousePressed() {
   // when pressed on dot
-  if (isInsideCircle(33 + 35, 465 + 35, 35)) {
+  if (isMouseInsideCircle(33 + 35, 465 + 35, 35)) {
     clickTimeOnDot = second();
     endTimeForDot = getEndTime(clickTimeOnDot);
   }
 
   // when pressed on plus or minus
-  if (isInsideCircle(362 + 35, 465 + 35, 35)) {
+  if (isMouseInsideCircle(362 + 35, 465 + 35, 35)) {
     clickTimeOnPlusMinus = second();
     endTimeForPlusMinus = getEndTime(clickTimeOnPlusMinus);
+  }
+
+  // when pressed on equal
+  if (isMouseInsideRectangle(213, 431, 38, 23)) {
+    clickTimeOnEqual = second();
+    endTimeForEqual = getEndTime(clickTimeOnEqual);
   }
 }
 
@@ -123,6 +163,17 @@ private void setColorOfDot() {
     } else {
       colorOfDot = darkestGrey;
       clickTimeOnDot = Integer.MIN_VALUE;
+    }
+  }
+}
+
+private void setColorOfEqual() {
+  if (clickTimeOnEqual >= 0) {
+    if (second() != endTimeForEqual) {
+      colorOfEqual = red;
+    } else {
+      colorOfEqual = darkestGrey;
+      clickTimeOnEqual = Integer.MIN_VALUE;
     }
   }
 }
@@ -138,8 +189,8 @@ private void setColorOfPlusMinus() {
   }
 }
 
-private int getEndTime(int clickTimeOnDot) {
-  int endTime = clickTimeOnDot + DELAY_IN_SECONDS;
+private int getEndTime(int clickTime) {
+  int endTime = clickTime + DELAY_IN_SECONDS;
   if (endTime > 59) {
     int remainder = endTime % 59;
     endTime = remainder - 1;
